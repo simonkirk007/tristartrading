@@ -1,0 +1,38 @@
+<div class="topbar-wrapper-full">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                Free test
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% schema %}
+    {
+      "name": "Top Bar Free Shipping",
+      "tag": "section",
+      "class": "top-bar-section",
+      "settings": [
+        {
+          "type": "text",
+          "id": "top-bar-section",
+          "default": "Free Shipping",
+          "label": "Free Shipping"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "default": "<p>Place ALL orders for pickup.</p>",
+          "label": "Content"
+        }
+    ],
+    "presets": [
+        {
+          "name": "Top Bar Free Shipping"
+        }
+      ]
+    }
+
+{% endschema %}

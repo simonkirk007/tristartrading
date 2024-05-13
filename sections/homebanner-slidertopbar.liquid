@@ -1,0 +1,70 @@
+<section class="boxes">
+    <div class="container">
+        <div class="row">
+
+            {%- for block in section.blocks -%}
+            <div class="col-12 col-lg-6 col-md-12">
+                <div class="box-item">
+                    <div class="box-inner-item">
+                        <img src="{{ block.settings.image | img_url: 'master' }}" alt="">
+                    </div>
+                    <div class="box-content">
+                        <h3>{{ block.settings.title | escape }}</h3>
+                        <a class="{% if forloop.index == 2 %}btn-4{% else %}btn-1{% endif %}" href="{{ block.settings.link_url }}">{{ block.settings.link_title }}</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            
+        </div>
+    </div>
+</section>
+
+
+
+{% schema %}
+   {
+  "name": "Cus Product Bann",
+  "tag": "section",
+  "class": "announcement-bar-section",
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Custom Product Banner", // Changed the block name to a string
+
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "default": "Collection",
+          "label": "Title"
+        },
+        {
+          "type": "text",
+          "id": "link_title",
+          "default": "Shop Now",
+          "label": "Button Title"
+        },
+        {
+          "type": "url",
+          "id": "link_url",
+          "label": "Button Link"
+        }
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Cus Product Bann"
+    }
+  ]
+}
+
+
+{% endschema %}

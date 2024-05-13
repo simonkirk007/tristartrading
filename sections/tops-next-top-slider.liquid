@@ -1,0 +1,62 @@
+<div class="categroy-image-and-link">
+  <div class="tagslider-categroy">
+    <div class="text-center">
+      <h3>{{ section.settings.as-seen-logo-heading }}</h3>
+    </div>
+       <div class="tagslider-categroy-slider" data-flickity='{ "freeScroll": true, "wrapAround": true, "groupCells": true, "prevNextButtons": true,    "autoPlay": 5000 }'>
+      {% for block in section.blocks %}
+      <div class="tagslider-categroy-cell">
+        <a href="{{ block.settings.link }}">
+          <img src="{{ block.settings.image | img_url: 'master' }}" alt="">
+        </a>
+      </div>
+      {% endfor %}
+    </div> 
+ 
+  </div>
+</div>
+
+{% schema %} 
+   {
+  "name": "Categroy Image and Link",
+  "tag": "section",
+  "class": "categroy-image-and-link",
+      "settings": [
+        {
+          "type": "text",
+          "id": "categroy-image-and-link",
+          "default": "Categroy Image and Link",
+          "label": "Title"
+        }
+      ],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Categroy Image and Link", // Changed the block name to a string
+
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        } ,
+          {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        } 
+        
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Categroy Image and Link"
+    }
+  ]
+}
+
+{% endschema %}
+
+ 

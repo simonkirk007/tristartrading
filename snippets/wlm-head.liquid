@@ -1,0 +1,91 @@
+<script type='text/javascript' src='https://www.tristartrading.com/apps/wlm/js/wlm-1.1.js'></script>
+{% assign wlmEnabled = true %}
+{% assign wlmLockON = false %}
+{% assign wlmRedirectURL = '' %} 
+{% assign wlmPnfHead = '' %} 
+{% assign wlmPnfMsg = '' %}
+{% assign wlmPwdForm = false %}
+{% assign wlmPwdMsg = '' %}
+{% assign wlmSuperPage = false %}
+
+{% if template == 'customers/login' or template == 'customers/activate_account' or template == 'customers/reset_password' or canonical_url contains 'challenge' %}
+
+{% unless canonical_url contains '/products/' or canonical_url contains '/collection/' or canonical_url contains '/collections/' or canonical_url contains '/search' %} {% assign wlmSuperPage = true %}
+ {% endunless %}{% endif %}
+
+{% capture wlm_check %}{% include 'super_page_access' %}{% endcapture %}{% unless wlm_check contains 'Liquid error' %}{% include 'super_page_access' %}{% endunless %}
+{% if wlmEnabled %}
+<style type="text/css">.wlm-message-pnf{text-align:center;}#wlm-pwd-form {padding: 30px 0;text-align: center}#wlm-wrapper,.wlm-form-holder {display: inline-block}#wlm-pwd-error {display: none;color: #fb8077;text-align: left}#wlm-pwd-error.wlm-error {border: 1px solid #fb8077}#wlm-pwd-form-button {display: inline-block!important;height: auto!important;padding: 8px 15px!important;background: #777;border-radius: 3px!important;color: #fff!important;text-decoration: none!important;vertical-align: top}.wlm-instantclick-fix,.wlm-item-selector {position: absolute;z-index: -999;display: none;height: 0;width: 0;font-size: 0;line-height: 0}</style>
+
+{% assign wlmLockedTags213268 = false %}
+{% assign wlmLockedTags235956 = false %}
+{% for tag in customer.tags %}
+{% if tag == 'manual-wholesale-customer' %}{% assign wlmLockedTags213268 = true %}{% endif %}
+{% if tag == 'manual-wholesale-customer' %}{% assign wlmLockedTags235956 = true %}{% endif %}
+{% endfor %}
+
+{% unless wlmLockON or wlmSuperPage or template == 'customers/register' %}
+{% assign wlmLockedContent = false %}
+{% if template contains "collection" or template contains "product" %}
+{% if product.collections %}
+{% for c in product.collections %}
+{% if c.id == 409920897250 or c.id == 417351598306 or c.id == 217875021988 or c.id == 410344816866 or c.id == 415070585058 %} 
+{% assign wlmLockedContent = true %}{% break %}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if template contains 'collection' or template contains 'product' %}
+{% if collection %}
+{% if   collection.handle == 'belts' or  collection.handle == 'belts-slings' or  collection.handle == 'pew-pew-tactical' or  collection.handle == 'slings' or  collection.handle == 'sonoran-desert-institute' %}
+{% assign wlmLockedContent = true %}
+{% endif %}
+{% endif %}
+{% endif %}
+{% if wlmLockedContent %}
+{% if customer %}
+{% if wlmLockedTags213268 %}{% assign wlmLockON = true %}{% else %}{% assign wlmLockON = false %}{% endif %}
+{% if wlmLockON %}
+{% capture wlmPnfHead %}Page not found{% endcapture %}
+{% capture wlmPnfMsg %}<p>Sorry, we couldn't find this page.</p>{% endcapture %}
+{% capture wlmRedirectURL %}/pages/ws-proxy{% endcapture %}
+{% endif %}
+{% endif %}
+{% endif %}
+{% endunless %}
+
+
+{% unless wlmLockON or wlmSuperPage or template == 'customers/register' %}
+{% assign wlmLockedContent = false %}
+{% if template contains "product" and product %} {% if product.id == 8096093765858 or product.id == 6918228115650 or product.id == 8145745772770 or product.id == 5771856674980 or product.id == 7840435962082 or product.id == 7503088746722 or product.id == 8026357989602 or product.id == 8026363265250 or product.id == 8322861170914 or product.id == 8322925691106 or product.id == 8322892857570 or product.id == 7801241829602 or product.id == 8145766154466 or product.id == 7812820041954 or product.id == 8322585854178 or product.id == 8322589032674 or product.id == 7837607821538 or product.id == 8126007214306 or product.id == 5757478305956 or product.id == 7954902941922 or product.id == 8216015405282 or product.id == 8211681018082 or product.id == 8211673284834 or product.id == 8211660407010 or product.id == 6074605568194 or product.id == 7697740660962 or product.id == 4801133445257 or product.id == 6564662247618 or product.id == 6564657037506 or product.id == 8069905842402 or product.id == 6833561174210 or product.id == 6833559994562 or product.id == 8069901877474 or product.id == 7657713762530 or product.id == 7434889265378 or product.id == 7648853229794 or product.id == 7862318334178 or product.id == 7630107541730 or product.id == 7436683051234 or product.id == 7630096662754 or product.id == 7436691538146 or product.id == 7926084010210 or product.id == 7932846276834 or product.id == 8212684603618 or product.id == 7932848636130 or product.id == 8145870946530 or product.id == 7932843655394 or product.id == 7926086271202 or product.id == 7950940111074 or product.id == 8212662943970 or product.id == 8153803981026 or product.id == 7630105673954 or product.id == 7630103904482 or product.id == 8234067329250 or product.id == 6074569457858 or product.id == 6686695456962 or product.id == 5806276837540 or product.id == 5806295023780 or product.id == 5806297776292 or product.id == 8120878694626 or product.id == 8140293013730 or product.id == 5833542533284 or product.id == 5833547710628 or product.id == 6074560184514 or product.id == 7631041691874 or product.id == 8198991872226 or product.id == 8111760179426 or product.id == 7930794606818 or product.id == 5801033236644 or product.id == 6230596812994 or product.id == 5636362993828 or product.id == 8026371522786 or product.id == 5757467295908 or product.id == 5636343824548 or product.id == 7994895565026 or product.id == 5636142497956 or product.id == 5757473521828 or product.id == 5636483448996 or product.id == 6577530273986 or product.id == 8050029396194 or product.id == 5636099113124 or product.id == 6567943307458 or product.id == 8069885100258 or product.id == 7697739251938 or product.id == 5806233419940 or product.id == 6608210886850 or product.id == 7625043050722 or product.id == 7996756066530 or product.id == 6757051793602 or product.id == 6790814335170 or product.id == 6790819119298 or product.id == 8145747378402 or product.id == 8145747673314 or product.id == 8145746034914 or product.id == 7985957109986 or product.id == 7985967595746 or product.id == 7985948754146 or product.id == 8145059217634 or product.id == 7972344692962 or product.id == 8075263901922 or product.id == 8106866933986 or product.id == 8096094879970 or product.id == 8159642321122 or product.id == 8134298927330 %} {% assign wlmLockedContent = true %}{% endif %}{% endif %}{% if wlmLockedContent %}
+{% if customer %}
+{% if wlmLockedTags235956 %}{% assign wlmLockON = true %}{% else %}{% assign wlmLockON = false %}{% endif %}
+{% if wlmLockON %}
+{% capture wlmPnfHead %}Page not found{% endcapture %}
+{% capture wlmPnfMsg %}<p>Sorry, we couldn't find this page.</p>{% endcapture %}
+{% capture wlmRedirectURL %}https://www.tristartrading.com/{% endcapture %}
+{% endif %}
+{% endif %}
+{% endif %}
+{% endunless %}
+
+
+{% endif %}
+
+{% capture wlm_check_hide %}{% include 'wlm-hideByLink' %}{% endcapture %}{% unless wlm_check_hide contains 'Liquid error' %}{% include 'wlm-hideByLink' %}{% endunless %}
+
+        {% if wlmLockON %}<meta name='robots' content='NOINDEX,NOFOLLOW,NOARCHIVE,NOSNIPPET,NOODP,NOYDIR' />{% endif %}
+      <script type='text/javascript'>
+      {% if wlmLockON %}
+        wlm.navigate('{{ wlmRedirectURL}}');
+      {% else %}
+        wlm.navigateByLocation();
+      {% endif %}
+      wlm.jq(document).ready(function(){
+        wlm.removeLinks();
+      });
+    </script>
+    {% capture wlm_hide_price_check %}{% include "wlm-hide-price" %}{% endcapture %}
+    {% unless wlm_hide_price_check contains 'Liquid error' %}
+        {% include "wlm-hide-price" %}
+    {% endunless %}

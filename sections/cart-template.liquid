@@ -1,0 +1,392 @@
+{% comment %}
+** Cart page - default view **
+- Template section
+{% endcomment %}
+
+<section class="section">
+  <a name="pagecontent" id="pagecontent"></a>
+  <div class="container content">
+    <div class="one-whole column">
+
+      <h1>{{ 'cart.general.title' | t }}</h1>
+      <div class="feature_divider"></div>
+    </div>
+
+    {% if cart.item_count == 0 %}
+      <div class="three-eighths columns medium-down--one-whole offset-by-five is-hidden-offset-mobile-only">
+        <p class="quote">{{ 'cart.general.continue_browsing_html' | t }}</p>
+
+        <a href="{% if cart.items.first.product.collections != blank %}{{ cart.items.first.product.collections.last.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}" class="cart__continue-shopping global-button global-button--text">{{ 'cart.general.continue_shopping_link_html' | t }}</a>
+      </div>
+      <br />
+    {% else %}
+      <div class="three-eighths columns medium-down--one-whole offset-by-five is-hidden-offset-mobile-only hidden js-empty-cart__message">
+        <p class="quote">{{ 'cart.general.continue_browsing_html' | t }}</p>
+
+        <a href="{% if cart.items.first.product.collections != blank %}{{ cart.items.first.product.collections.last.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}" class="cart__continue-shopping global-button global-button--text">{{ 'cart.general.continue_shopping_link_html' | t }}</a>
+      </div>
+      <br />
+
+      <form action="{{ routes.cart_url }}" method="post" id="cart_form" data-cart-form="cart-template" data-total-discount="{{ cart.total_discount }}">
+        <div class="cart__wrapper is-flex is-flex-wrap">
+          <div class="two-thirds columns medium-down--one-whole">
+            {%- assign total_saving = 0 -%}
+
+            {%- assign wcp_total_price = 0 -%} 
+            {% for item in cart.items %}
+            {%- include 'wcp_discount' with item.product -%}
+            {%- include 'wcp_variant' with item.variant -%}
+            {%- include 'wcp_vd_discount' with item -%}  
+            {%- assign  wcp_custom_final_Price = item.final_price  -%} 
+            {%- if wcp_v_price < wcp_custom_final_Price -%}
+            {%- assign wcp_line_price = wcp_v_price | floor | minus: 0 | times: item.quantity -%}
+            {%- else -%}
+            {%- assign wcp_line_price = wcp_custom_final_Price | floor | minus: 0 | times: item.quantity -%}
+            {%- assign wcp_v_price = wcp_custom_final_Price | floor | minus: 0 -%}
+            {%- endif -%}
+            {%- assign wcp_total_price = wcp_total_price | plus: wcp_line_price -%}	
+
+              {% if  wcp_v_compare_at_price  >  wcp_v_price  %}
+                {%- assign saving =  wcp_v_compare_at_price  | minus:  wcp_v_price  | times: item.quantity -%}
+                {%- assign total_saving = saving | plus: total_saving -%}
+              {% endif %}
+
+              <div class="cart__item" data-cart-item data-line-id="{{ forloop.index }}" data-variant-id="{{ item.id }}">
+                <div class="one-third column medium-down--one-whole cart__item--image">
+                  <a href="{{ item.url }}" title="{{ item.title | escape }}" class="cart_page_image">
+                    {% render 'image-element',
+                            image: item.image,
+                            alt: item.title,
+                            object_fit: settings.align_height,
+                            max_height: settings.collection_height
+                    %}
+                  </a>
+                </div>
+
+                <div class="two-thirds columns medium-down--one-whole cart_content_info cart__item--content">
+                  <h3 class="cart__item--title">
+                    <a href="{{ item.url }}">{{ item.product.title }}</a>
+                  </h3>
+
+                  {{NextDiscountHtml}}
+
+                  {% unless item.product.has_only_default_variant or item.variant.title contains "Title" %}
+                    <p class="meta">
+                      {% for option in item.product.options %}
+                        <span class="label">{{ option }}:</span> <span>{{ item.variant.options[forloop.index0] }}</span><br />
+                      {% endfor %}
+                    </p>
+                  {% endunless %}
+
+                  {% if item.properties %}
+                    <p>
+                      {% for p in item.properties %}
+                        {% unless p.last == blank %}
+                          {% if p.last contains '/uploads/' %}
+                            <div>
+                              {{ p.first }}: <a class="lightbox" href="{{ p.last }}">{{ 'cart.general.uploaded_file' | t }}</a>
+                            </div>
+                          {% else %}
+
+                          <div>
+                            {{ p.first }}: {{ p.last }}
+                          </div>
+                        {% endif %}
+                      {% endunless %}
+                    {% endfor %}
+                  </p>
+                {% endif %}
+
+                <p class="modal_price">
+                  {% if  wcp_v_price  > 0 %}
+                    <span class="money {% if  wcp_v_price  <  wcp_v_compare_at_price  or item.line_level_discount_allocations.size > 0 %}sale{% endif %}">
+                      {% render 'price-element', price:  wcp_v_price  %}
+                    </span>
+
+                    {% if  wcp_v_price  <  wcp_v_compare_at_price  or item.line_level_discount_allocations.size > 0 %}
+                      <span class="money was_price">
+                        {% render 'price-element', price:  wcp_v_compare_at_price  %}
+                      </span>
+                    {% endif %}
+                  {% else %}
+                    {{ settings.free_price_text }}
+                  {% endif %}
+                </p>
+
+                {% if item.line_level_discount_allocations.size > 0 %}
+                  {% for discount_allocation in item.line_level_discount_allocations %}
+                    <p class="meta cart__item--discount">
+                      <span class="label">{{ 'cart.general.discount' | t }}:</span>
+                      {{ discount_allocation.discount_application.title }} (-<span class="money">{% render 'price-element', price: discount_allocation.amount %}</span>)
+                    </p>
+                  {% endfor %}
+                {% endif %}
+
+                <div class="product-quantity-box left">
+                  <span class="ss-icon product-minus js-change-quantity" data-func="minus">
+                    <span class="icon-minus"></span>
+                  </span>
+
+                  <input type="number" min="0" size="2" class="quantity" name="updates[]" id="updates_{{ item.id }}" value="{{ item.quantity }}" data-cart-quantity-input="cart-template" {% if settings.limit_quantity and item.variant.inventory_management != blank and item.variant.inventory_quantity > 0 and item.variant.inventory_policy == "deny" %}max="{{ item.variant.inventory_quantity }}"{% endif %} />
+
+                  <span class="ss-icon product-plus js-change-quantity" data-func="plus">
+                    <span class="icon-plus"></span>
+                  </span>
+                </div>
+
+                <p class="price_total">
+                  <strong>{{ 'cart.general.total' | t }}:</strong>
+
+                  {% if item.line_level_discount_allocations.size > 0 or item.original_line_price > wcp_line_price %}
+                    <span class="money">
+                      {% render 'price-element', price:  wcp_line_price  %}
+                    </span>
+                  {% endif %}
+
+                  <span class="money {% if item.line_level_discount_allocations.size > 0 or item.original_line_price > wcp_line_price %}was_price{% endif %}">
+                    {% render 'price-element', price: item.original_line_price %}
+                  </span>
+                </p>
+
+                <a href="{{ routes.cart_change_url }}?line={{ forloop.index }}&amp;quantity=0" class="cart__remove-btn" data-line-id="{{ forloop.index }}" data-remove-item="cart-template"><span class="remove-text">{{ 'cart.general.remove' | t }}</span> <span class="remove-icon"></span></a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div class="one-third column medium-down--one-whole">
+          <div class="subtotal">
+            {% if cart.cart_level_discount_applications != blank %}
+              <p class="cart_discounts js-cart_discounts sale">
+                {% for discount_application in cart.cart_level_discount_applications %}
+                  <span class="cart_discounts--title">{{ discount_application.title }}</span>
+                  <span class="cart_discounts--price">
+                    -<span class="money">{% render 'price-element', price: discount_application.total_allocated_amount %}</span>
+                  </span>
+                {% endfor %}
+              </p>
+            {% endif %}
+
+            {% assign wcp_wholesale_customer = false %}
+            {% if shop.metafields.wcp_status.wcp_status != 'disabled' and customer %}
+            {% assign active_discounts = shop.metafields.wcp_active_discounts.wcp_active_discounts %}
+            {% assign active_discounts_array = active_discounts | split: ',' %}
+            {% assign customer_tags = blank %}
+            {% for tag in customer.tags %}
+            {% assign tempTag = tag | downcase %}
+            {% assign customer_tags = customer_tags | prepend:tempTag %}
+            {% unless forloop.last %}
+            {% assign customer_tags = customer_tags | prepend:','  %}
+            {% endunless %}
+            {% endfor %}
+            {% assign customer_tags = customer_tags | split:',' %}
+            {% assign active_discounts = active_discounts | downcase %}
+            {% for discount_key in active_discounts_array %}
+            {% assign key_split = discount_key | split: '-' %}
+            {% assign key_split_length = key_split | size %}
+            {% if key_split_length > 2 %}
+            {% assign removeable_key = key_split.last | prepend: '-' %}
+            {% assign wcp_customer_tag = discount_key | remove_last: removeable_key %}
+            {% else %}
+            {% assign wcp_customer_tag = key_split[0] %}
+            {% endif %}
+            {% assign wcp_customer_tag = wcp_customer_tag | downcase %}
+            {% if customer_tags contains wcp_customer_tag %}
+            {% assign wcp_wholesale_customer = true %}
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+
+            <p class="cart_subtotal js-cart_subtotal">
+              <span class="right">
+                <span {% if wcp_wholesale_customer == false %}class="money"{% endif %}>
+                  <span class="wcp-original-cart-total">{{ cart.total_price | money}}</span>
+                  <span class="wcp-cart-total"></span>
+                </span>
+              </span>
+              <span>{{ 'cart.general.subtotal' | t }}</span>
+            </p>
+            <div class="additional-notes">
+                <span class="wcp-minimums-note"></span>
+                <span class="wcp-extra-note "></span>
+            </div>{% render 'wcp_multi_currency_msg' %}
+
+            {% if section.settings.display_savings and total_saving > 0 or section.settings.display_savings and cart.total_discount > 0 %}
+              <p class="cart_savings js-cart_savings sale">
+                <span class="right">
+                  <span class="money">{% assign total_savings = total_saving | plus: cart.total_discount %}{% render 'price-element', price: total_savings %}</span>
+                </span>
+                <span>{{ 'layout.general.savings' | t }}</span>
+              </p>
+            {% endif %}
+
+            {% unless shop.enabled_currencies.size > 1 %}
+              <p>
+                <small>{{ 'cart.general.orders_processed_in_currency_html' | t: currency: shop.currency }}</small>
+              </p>
+            {% endunless %}
+
+            {% if section.settings.display_special_instructions %}
+              <label for="note">{{ 'cart.general.note' | t: shop_name: shop.name }}:</label>
+              <textarea id="note" name="note" rows="2">{{ cart.note }}</textarea>
+            {% endif %}
+
+            {% if settings.display_tos_checkbox %}
+              <p>
+                <input type="checkbox" class="tos_agree" id="cart_agree" required />
+
+                <label class="tos_label" for="cart_agree">
+                  {{ 'cart.general.agree_to_terms_html' | t }}
+                </label>
+
+                {% if settings.tos_page != blank %}
+                  <a href="{{ settings.tos_page }}" target="_blank" class="tos_icon">{{ 'cart.general.view_terms' | t }}</a>
+                {% endif %}
+              </p>
+            {% endif %}
+
+            {% if section.settings.cart_message != blank %}
+              {{ section.settings.cart_message }}
+            {% endif %}
+
+            <p class="tos_warning checkout_button">
+              <button type="submit" class="global-button global-button--primary add_to_cart" id="checkout" name="checkout" data-cart-checkout-button>{% if settings.show_lock_icon %}<span class="icon-lock"></span>{% endif %}{{ 'cart.general.checkout' | t }}</button>
+            </p>
+
+            <div>
+                {% if customer.tags contains "wpdnet" %}
+                    {% if shop.metafields.wcp_net.isNetEnabled == "true" or shop.metafields.wcp_net.isNetEnabled == "1" %}
+                        <div style="margin-top:30px;">
+                            <p>{{shop.metafields.wcp_net.netCartMsg}}</p>
+                            <a id="wcp-30-open" class="global-button global-button--primary" style="width:100%;">{{shop.metafields.wcp_net.netBtnMsg}}</a>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            {% if content_for_additional_checkout_buttons %}
+              <div class="additional-checkout-buttons additional-checkout-buttons--vertical">
+                {{ content_for_additional_checkout_buttons }}
+              </div>
+              <script>
+                  var v = setInterval(function()
+                  {
+                      if(typeof window.wcp_data != 'undefined' && typeof window.wcp_data.discounted_hash != 'undefined')
+                      {
+                          if((window.wcp_data.discounted_hash.discount_value || window.wcp_data.discounted_hash.shipping) && $('.additional-checkout-buttons').children(':visible').length > 0)
+                          {
+                              $('.additional-checkout-buttons').html("Other payment options are available at checkout");
+                              clearInterval(v);
+                          }   
+                      }  
+                      
+                  },500);                                 
+              </script>
+            {% endif %}
+
+            {% if cart.item_count > 0 %}
+              <a href="{% if cart.items.first.product.collections != blank %}{{ cart.items.first.product.collections.last.url }}{% else %}{{ routes.all_products_collection_url }}{% endif %}" class="continue-shopping">{{ 'cart.general.continue_shopping_link_html' | t }}</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </form>
+  {% endif %}
+  </div>
+</section>
+
+{% render 'cart-shipping-calculator' %}
+
+<div class="cart__blocks">
+  {% for block in section.blocks %}
+    <div {{ block.shopify_attributes }} class="block__{{ block.type }} block__{{ block.id }}">
+      {% if block.type == 'featured_collection' %}
+        {% include 'include-featured-collection', type: 'block' %}
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+  {
+    "name": "Cart page",
+    "class": "shopify-section--cart-template",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "display_special_instructions",
+        "label": "Show \"note\" text box"
+      },
+      {
+        "type": "checkbox",
+        "id": "display_savings",
+        "label": "Show total savings",
+        "default": true
+      },
+      {
+        "type": "richtext",
+        "id": "cart_message",
+        "label": "Cart message"
+      }
+    ],
+    "blocks": [
+      {
+        "type": "featured_collection",
+        "name": "Featured collection",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "You may also be interested in"
+          },
+          {
+            "type": "checkbox",
+            "id": "collection_description",
+            "label": "Show collection description",
+            "default": false
+          },
+          {
+            "type": "collection",
+            "id": "collection",
+            "label": "Collection"
+          },
+          {
+            "type": "radio",
+            "id": "collection_style",
+            "label": "Collection layout",
+            "default": "grid",
+            "options": [
+              {
+                "value": "slider",
+                "label": "Slider"
+              },
+              {
+                "value": "grid",
+                "label": "Grid"
+              }
+            ]
+          },
+          {
+            "type": "range",
+            "id": "products_per",
+            "label": "Products per row",
+            "min": 2,
+            "max": 7,
+            "step": 1,
+            "default": 6
+          },
+          {
+            "type": "range",
+            "id": "products_limit",
+            "label": "Limit products",
+            "min": 2,
+            "max": 50,
+            "step": 1,
+            "default": 6
+          }
+        ]
+      }
+    ]
+  }
+{% endschema %}

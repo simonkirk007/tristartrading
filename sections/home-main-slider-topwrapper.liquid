@@ -1,0 +1,74 @@
+<div class="home-mainslider-topwrapper">
+  <div class="mainslider-banner"> 
+       <div class="mainslider-banner-slider" data-flickity='{   "contain": true,  "fullscreen": true, "lazyLoad": 1 , "prevNextButtons": true,    "autoPlay": 5000 }'>
+      {% for block in section.blocks %}
+      <div class="mainslider-banner-cell position-relative">
+          <img src="{{ block.settings.image | img_url: 'master' }}" alt="">
+        <div class="upperbanner-area">
+          {% if block.settings.headingtextImage %}
+  <img src="{{ block.settings.headingtextImage | img_url: 'master' }}" alt="" width="1000" height="210">
+{% endif %} 
+
+          
+                {% if block.settings.Buttonlabel != blank   %}
+        <a href="{{ block.settings.link }}"> {{ block.settings.Buttonlabel }}</a>
+          {% endif %}
+ 
+
+          
+             </div>
+      </div>
+      {% endfor %}
+    </div> 
+ 
+  </div>
+</div>
+
+{% schema %} 
+   {
+  "name": "Homepage Main Slider",
+  "tag": "section",
+  "class": "home-mainslider-topwrapper",
+   
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Homepage Main Slider", // Changed the block name to a string
+
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        } ,
+        {
+          "type": "image_picker",
+          "id": "headingtextImage",
+          "label": "Content Image"
+        } ,
+
+          {
+          "type": "text",
+          "id": "Buttonlabel",
+          "label": "Shop"
+        } ,
+        {
+        "type": "url",
+        "id": "link",
+        "label": "Link"
+      } 
+        
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Homepage Main Slider"
+    }
+  ]
+}
+
+{% endschema %}
+
+ 

@@ -1,0 +1,17 @@
+{%- assign w_continue = 'no' -%}
+{% assign wlmHideItem_Collection = false %}{% assign wlmLockedTags213268 = false %}
+{% assign wlmLockedTags235956 = false %}
+
+
+{% assign wlmLockedTags213268 = false %}
+{% assign wlmLockedTags235956 = false %}
+{% for tag in customer.tags %}
+{% if tag == 'manual-wholesale-customer' %}{% assign wlmLockedTags213268 = true %}{% endif %}
+{% if tag == 'manual-wholesale-customer' %}{% assign wlmLockedTags235956 = true %}{% endif %}
+{% endfor %}
+
+
+
+{% if wlmHideItem_Collection == true %}{% continue %}{% endif %}
+
+{%- if wlm_is_render == 'yes' -%}{{- w_continue -}}{%-endif-%}

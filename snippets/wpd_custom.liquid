@@ -1,0 +1,40 @@
+{% if canonical_url contains "wpd-cart" or template contains 'cart' %}
+  {% assign is_wcp_wholesale_customer = false %}
+{% assign active_discounts = shop.metafields.wcp_active_discounts.wcp_active_discounts %}
+{% assign active_discounts_array = active_discounts | split: ',' %}
+{% if shop.metafields.wcp_status.wcp_status != 'disabled' and customer %}
+    {% for discount_key in active_discounts_array %}
+        {% assign key_split = discount_key | split: '-' %}
+        {% assign key_split_length = key_split | size %}
+        {% if key_split_length > 2 %}            
+            {% assign removeable_key = key_split.last | prepend: '-' %}
+            {% assign wcp_hide_sale_badge_customer_tag = discount_key | remove_first: removeable_key %}
+        {% else %}
+            {% assign wcp_hide_sale_badge_customer_tag = key_split[0] %}      
+        {% endif %}
+        {% if customer.tags contains wcp_hide_sale_badge_customer_tag %}
+            {% assign is_wcp_wholesale_customer = true %}     
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% if is_wcp_wholesale_customer == true %}
+  
+       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+   <script>
+
+     
+     function hide_checkout(){
+           if( typeof wcp_data !== "undefined" ) {
+               if(wcp_data.discounted_hash.minimumCartRequirement == false  ){
+                 $('#wpd-cart-drawer-checkout, button[name="checkout"], #wcp-30-open, #dynamic-checkout-cart').css('display','none')
+               }else{
+                 $('#wpd-cart-drawer-checkout, button[name="checkout"], #wcp-30-open').css('display','block')
+               }
+           }
+     }
+     setInterval(() => {
+       hide_checkout();
+     },500)
+   </script>
+  {% endif %}
+   {% endif %}

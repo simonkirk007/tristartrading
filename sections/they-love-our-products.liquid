@@ -1,0 +1,71 @@
+<div class="home-love-our-product">
+  <div class="mainslider-love-our-product"> 
+       <div class="text-center  ">
+     <h3 class="title ">{{ section.settings.title }} </h3>
+   </div>
+
+       <div class="love-our-product-slider" data-flickity='{ "freeScroll": true, "wrapAround": true, "groupCells": true, "prevNextButtons": true,    "autoPlay": 5000 }'>
+      {% for block in section.blocks %}
+      <div class="love-our-product-cell">
+        <a href="{{ block.settings.link }}">
+          <img src="{{ block.settings.image | img_url: 'master' }}" alt="">
+        </a>
+        <div class="lvoe-upper">
+          <h3>{{ block.settings.NameUser }}</h3>
+          <h6>{{ block.settings.instagramlink }}</h6> 
+        </div>
+      </div>
+      {% endfor %}
+    </div> 
+ 
+  </div>
+</div>
+
+{% schema %} 
+   {
+  "name": "Love Our Product",
+  "tag": "section",
+  "class": "home-love-our-product",
+   "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "They Love Our Products"
+      }],
+  "blocks": [
+    {
+      "type": "column",
+      "name": "Love Our Product",  
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        } , 
+
+          {
+          "type": "text",
+          "id": "NameUser",
+          "label": "Name"
+        } ,
+        {
+        "type": "text",
+        "id": "instagramlink",
+        "label": "Link"
+      } 
+        
+      ]
+    }
+  ],
+
+  "presets": [
+    {
+      "name": "Love Our Product"
+    }
+  ]
+}
+
+{% endschema %}
+
+ 

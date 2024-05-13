@@ -1,0 +1,116 @@
+
+{% capture wpd_discounted_prices %}{%- render 'wcp_discount'  wcp_discount:product , wpd_is_render:'yes' -%}{% endcapture %}
+    
+    {%- capture wcp_price -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_price' -%}{%- endcapture -%}
+    {% assign  wcp_price = wcp_price | minus: 0 %}
+    
+    {%- capture wcp_compare_at_price  -%}{%- render 'wcp_render_discount', wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_compare_at_price' -%}{%- endcapture -%}
+    {% if wcp_compare_at_price != blank %}
+        {% assign  wcp_compare_at_price = wcp_compare_at_price | minus: 0 %}
+    {% else %}
+    {% assign  wcp_compare_at_price = nil %}
+    {% endif %}
+    
+    {%- capture wcp_compare_at_price_min  -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_compare_at_price_min' -%}{%- endcapture -%}
+    {% assign  wcp_compare_at_price_min = wcp_compare_at_price_min | minus: 0 %}
+    
+    {%- capture wcp_compare_at_price_max  -%}{%- render 'wcp_render_discount', wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_compare_at_price_max' -%}{%- endcapture -%}
+    {% assign  wcp_compare_at_price_max = wcp_compare_at_price_max | minus: 0 %}
+    
+    {%- capture wcp_price_min -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_price_min' -%}{%- endcapture -%}
+    {% assign  wcp_price_min = wcp_price_min | minus: 0 %}
+    
+    {%- capture wcp_price_max -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_price_max' -%}{%- endcapture -%}
+    {% assign  wcp_price_max = wcp_price_max | minus: 0 %}
+    
+    
+    {%- capture v_discount_tag -%}{%-render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'v_discount_tag'-%}{%- endcapture -%}
+    {% assign v_discount_tag = v_discount_tag | strip %}
+    
+    {%- capture p_discount_tag -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'p_discount_tag' -%}{%- endcapture -%}
+    {% assign p_discount_tag = p_discount_tag | strip %}
+    
+    {% assign raw_set_prices = product.metafields.wcp_set_prices.wcp_set_prices %}
+    {% assign set_prices_array = blank %}
+    {% if raw_set_prices %}
+        {% assign set_prices_array = raw_set_prices | split: ',' %}
+    {% endif %}
+    
+    {%- capture wcp_discount_value -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wpd_discounted_prices, price_variable:'wcp_discount_value' -%}{%- endcapture -%}
+    
+    {% capture wcp_v_discounted_prices %}{%- render 'wcp_variant' , wcp_variant:product.selected_or_first_available_variant , set_prices_array:set_prices_array , wpd_is_render:'yes', v_discount_tag : v_discount_tag , wcp_discount_value : wcp_discount_value -%}{%- endcapture -%}
+    
+    {%- capture wcp_v_price -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wcp_v_discounted_prices, price_variable:'wcp_v_price' -%}{%- endcapture -%}
+    {% assign  wcp_v_price = wcp_v_price | minus: 0 %}
+    
+    {%- capture wcp_v_compare_at_price -%}{%- render 'wcp_render_discount' , wpd_discounted_prices:wcp_v_discounted_prices, price_variable:'wcp_v_compare_at_price' -%}{%- endcapture -%}
+    {% if wcp_v_compare_at_price != blank %}
+        {% assign  wcp_v_compare_at_price = wcp_v_compare_at_price | minus: 0 %}
+    {% else %}
+    {% assign  wcp_v_compare_at_price = nil %}
+    {% endif %}
+{% layout none %}
+
+{% assign imgSrc = '""' %}
+{% assign price = '""' %}
+{% assign compare = '""' %}
+{% assign collections = '""' %}
+{% assign rawPrice = '""' %}
+{% assign rawCompare = '""' %}
+{% assign priceVaries = '""' %}
+{% assign priceMin = '""' %}
+{% assign textContent = '""' %}
+
+{% capture results %}
+  {% for item in search.results %}
+
+    {% if item.object_type == 'product' %}
+      {% assign imgSrc = item.featured_image.src | img_url: '200x'  | json %}
+      {% assign collections = item.collections | json %}
+      {% assign price = wcp_price | money | json %}
+      {% assign rawPrice = wcp_price | json %}
+      {% assign available = item.available | json %}
+      {% assign compare = wcp_compare_at_price_max | money | json %}
+      {% assign rawCompare = wcp_compare_at_price_max | json %}
+      {% assign priceVaries = item.price_varies | json %}
+      {% assign priceMin = wcp_price_min | json %}
+    {% elsif item.object_type == 'article' %}
+      {% if item.image.src != blank %}
+        {% assign imgSrc = item.image.src | img_url: '200x' | json %}
+      {% endif %}
+      {% assign textContent = item.excerpt | strip_html | truncatewords: 5 | json %}
+      {% assign available = true %}
+    {% elsif item.object_type == 'page' %}
+      {% assign available = true %}
+      {% assign textContent = item.content | strip_html | truncatewords: 5 | json %}
+    {% endif %}
+
+    {% assign product = item %}
+      {
+        "object_type": {{ product.object_type | json }},
+        "title"    : {{ product.title | json }},
+        "url"      : {{ product.url | json }},
+        "available": {{ available }},
+        "thumbnail": {{ imgSrc }},
+        "price"    : {{ price }},
+        "compare"  : {{ compare }},
+        "collections": {{ collections }},
+        "raw_price": {{ rawPrice }},
+        "raw_compare": {{ rawCompare }},
+        "price_varies": {{ priceVaries }},
+        "price_min": {{ priceMin }},
+        "text_content": {{ textContent }}
+      }
+    {% unless forloop.last %},{% endunless %}
+  {% endfor %}
+{% endcapture %}
+{
+  "results_count": {{ search.results_count }},
+  "results": [{{ results }}]
+}
+{%- assign wcp_prd_var = product -%}
+{%- unless wcp_prd_var == empty -%}
+            <script type='application/json' class='{%- for wcp_v in wcp_prd_var.variants -%} wcp_json_{{wcp_v.id}} {%- endfor -%} wcp_json_{{ wcp_prd_var.id }} wcp_json' id='wcp_json_{{ wcp_prd_var.id }}' > 
+                {%- render 'wcp_product_json' with wcp_prd_var -%}
+            </script>
+{%- endunless -%}
